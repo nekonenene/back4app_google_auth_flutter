@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
+import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 
 final logger = Logger();
 
 void main() async {
   await dotenv.load(fileName: '.env');
   logger.d('BACK4APP_APPLICATION_ID: ${dotenv.env['BACK4APP_APPLICATION_ID']}');
+
+  final applicationId = dotenv.env['BACK4APP_APPLICATION_ID'];
+  final clientKey = dotenv.env['BACK4APP_CLIENT_KEY'];
+  const parseServerUrl = 'https://parseapi.back4app.com';
+
+  await Parse().initialize(applicationId!, parseServerUrl, clientKey: clientKey, autoSendSessionId: true);
 
   runApp(const MyApp());
 }
