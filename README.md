@@ -1,16 +1,26 @@
 # back4app_google_auth_flutter
 
-A new Flutter project.
 
-## Getting Started
+## Setup
 
-This project is a starting point for a Flutter application.
+After clone this repository,
 
-A few resources to get you started if this is your first Flutter project:
+```sh
+cp .env.default .env
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Set `BACK4APP_APPLICATION_ID` and `BACK4APP_CLIENT_KEY` in `.env`.  
+(Ref: https://www.back4app.com/docs/react/quickstart )
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Then, install dependencies.
+
+```sh
+flutter pub get
+```
+
+
+## Run
+
+```sh
+flutter run
+```
