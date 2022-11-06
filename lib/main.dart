@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 
 final logger = Logger();
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: '.env');
+  logger.d('BACK4APP_APPLICATION_ID: ${dotenv.env['BACK4APP_APPLICATION_ID']}');
+
   runApp(const MyApp());
 }
 
