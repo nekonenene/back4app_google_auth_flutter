@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 
@@ -17,6 +18,26 @@ void main() async {
   await Parse().initialize(applicationId!, parseServerUrl, clientKey: clientKey, autoSendSessionId: true);
 
   runApp(const MyApp());
+}
+
+Future<void> googleLogin() async {
+  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+  ]);
+  GoogleSignInAccount? account = await googleSignIn.signIn();
+  logger.i(googleSignIn);
+  logger.i(account);
+
+  GoogleSignInAuthentication authentication = await account!.authentication;
+  final parseResponse = await ParseUser.loginWith(
+    'google',
+    google(authentication.accessToken!, googleSignIn.currentUser!.id, authentication.idToken!)
+  );
+
+  logger.i(parseResponse);
+  logger.i(parseResponse.result);
+  return parseResponse.result;
 }
 
 class MyApp extends StatelessWidget {
@@ -121,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () async { await googleLogin(); },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
