@@ -37,31 +37,84 @@ class MyApp extends StatelessWidget {
           appBar: AppBar(
             title: const Text(appTitle),
           ),
-          body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async { await googleLogin(); },
-                      child: const Text('SIGN IN'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async { await logout(); },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                      ),
-                      child: const Text('LOGOUT'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          body: const Center(
+            child: SignInOutWidget(),
           ),
         ),
       ),
+    );
+  }
+}
+
+class SignInOutWidget extends StatefulWidget {
+  const SignInOutWidget({super.key});
+
+  @override
+  SignInOutWidgetState createState() {
+    return SignInOutWidgetState();
+  }
+}
+
+class SignInOutWidgetState extends State<SignInOutWidget> {
+  ParseUser? currentUser;
+
+  Widget currentStateText() {
+    late final String message;
+    if (currentUser == null) {
+      message = '非ログイン状態です';
+    } else {
+      message = '${currentUser!.get('username')}さんがログイン中です';
+    }
+
+    return Text(message, style: const TextStyle(fontSize: 20));
+  }
+
+  void fetchCurrentUser() async {
+    currentUser = await ParseUser.currentUser() as ParseUser?;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCurrentUser();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        currentStateText(),
+        const Padding(padding: EdgeInsets.only(top: 18)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                final user = await googleLogin();
+                setState(() {
+                  currentUser = user;
+                });
+              },
+              child: const Text('SIGN IN'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final succeededLogout = await logout();
+                if (succeededLogout) {
+                  setState(() {
+                    currentUser = null;
+                  });
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('LOGOUT'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -87,14 +140,12 @@ Future<ParseUser> googleLogin() async {
   return parseResponse.result as ParseUser;
 }
 
-Future<ParseUser?> logout() async {
+Future<bool> logout() async {
   final user = await ParseUser.currentUser() as ParseUser?;
   if (user == null) {
-    return null;
+    return false;
   }
 
   final parseResponse = await user.logout();
-
-  logger.i(parseResponse.result);
-  return parseResponse.result as ParseUser;
+  return parseResponse.success;
 }
