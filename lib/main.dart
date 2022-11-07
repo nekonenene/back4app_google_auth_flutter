@@ -32,7 +32,9 @@ Future<void> googleLogin() async {
   GoogleSignInAuthentication authentication = await account!.authentication;
   final parseResponse = await ParseUser.loginWith(
     'google',
-    google(authentication.accessToken!, googleSignIn.currentUser!.id, authentication.idToken!)
+    google(authentication.accessToken!, googleSignIn.currentUser!.id, authentication.idToken!),
+    username: account.displayName,
+    email: account.email,
   );
 
   logger.i(parseResponse);
