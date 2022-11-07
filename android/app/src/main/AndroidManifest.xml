@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.hatone.back4app_google_auth_flutter">
    <application
-        android:label="back4app_google_auth_flutter"
+        android:label="Back4App Google OAuth"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
