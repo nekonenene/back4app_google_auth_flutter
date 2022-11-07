@@ -8,7 +8,7 @@
 PRODUCT_NAME = back4app_google_auth_flutter
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.back4appGoogleAuthFlutter
+PRODUCT_BUNDLE_IDENTIFIER = net.hatone.back4appGoogleAuthFlutter
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2022 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2022 net.hatone. All rights reserved.
