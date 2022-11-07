@@ -78,6 +78,15 @@ class SignInOutWidgetState extends State<SignInOutWidget> {
     currentUser = await ParseUser.currentUser() as ParseUser?;
   }
 
+void showFailedSignInToast() async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Oh, failed to sign-in...'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -97,9 +106,13 @@ class SignInOutWidgetState extends State<SignInOutWidget> {
             ElevatedButton(
               onPressed: () async {
                 final user = await googleLogin();
-                setState(() {
-                  currentUser = user;
-                });
+                if (user != null) {
+                  setState(() {
+                    currentUser = user;
+                  });
+                } else {
+                  showFailedSignInToast();
+                }
               },
               child: const Text('SIGN IN'),
             ),
@@ -124,7 +137,7 @@ class SignInOutWidgetState extends State<SignInOutWidget> {
   }
 }
 
-Future<ParseUser> googleLogin() async {
+Future<ParseUser?> googleLogin() async {
   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
@@ -133,7 +146,12 @@ Future<ParseUser> googleLogin() async {
   logger.i(googleSignIn);
   logger.i(account);
 
-  GoogleSignInAuthentication authentication = await account!.authentication;
+  // アカウント選択画面でどれも選ばれずに戻った場合
+  if (account == null) {
+    return null;
+  }
+
+  GoogleSignInAuthentication authentication = await account.authentication;
   final parseResponse = await ParseUser.loginWith(
     'google',
     google(authentication.accessToken!, googleSignIn.currentUser!.id, authentication.idToken!),
