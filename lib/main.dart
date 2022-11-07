@@ -105,6 +105,8 @@ void showFailedSignInToast() async {
           children: [
             ElevatedButton(
               onPressed: () async {
+                if (currentUser != null) return;
+
                 final user = await googleLogin();
                 if (user != null) {
                   setState(() {
@@ -118,6 +120,8 @@ void showFailedSignInToast() async {
             ),
             ElevatedButton(
               onPressed: () async {
+                if (currentUser == null) return;
+
                 final succeededLogout = await logout();
                 if (succeededLogout) {
                   setState(() {
@@ -138,6 +142,11 @@ void showFailedSignInToast() async {
 }
 
 Future<ParseUser?> googleLogin() async {
+  final user = await ParseUser.currentUser() as ParseUser?;
+  if (user != null) {
+    return user;
+  }
+
   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
@@ -165,10 +174,12 @@ Future<ParseUser?> googleLogin() async {
 
 Future<bool> logout() async {
   final user = await ParseUser.currentUser() as ParseUser?;
+  logger.d(user);
   if (user == null) {
     return false;
   }
 
   final parseResponse = await user.logout();
+  logger.d(parseResponse.success);
   return parseResponse.success;
 }
