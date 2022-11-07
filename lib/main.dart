@@ -20,28 +20,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-Future<ParseUser> googleLogin() async {
-  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-  ]);
-  GoogleSignInAccount? account = await googleSignIn.signIn();
-  logger.i(googleSignIn);
-  logger.i(account);
-
-  GoogleSignInAuthentication authentication = await account!.authentication;
-  final parseResponse = await ParseUser.loginWith(
-    'google',
-    google(authentication.accessToken!, googleSignIn.currentUser!.id, authentication.idToken!),
-    username: account.displayName,
-    email: account.email,
-  );
-
-  logger.i(parseResponse);
-  logger.i(parseResponse.result);
-  return parseResponse.result as ParseUser;
-}
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -71,7 +49,7 @@ class MyApp extends StatelessWidget {
                       child: const Text('SIGN IN'),
                     ),
                     ElevatedButton(
-                      onPressed: () async { await googleLogin(); },
+                      onPressed: () async { await logout(); },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
@@ -86,4 +64,37 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<ParseUser> googleLogin() async {
+  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+  ]);
+  GoogleSignInAccount? account = await googleSignIn.signIn();
+  logger.i(googleSignIn);
+  logger.i(account);
+
+  GoogleSignInAuthentication authentication = await account!.authentication;
+  final parseResponse = await ParseUser.loginWith(
+    'google',
+    google(authentication.accessToken!, googleSignIn.currentUser!.id, authentication.idToken!),
+    username: account.displayName,
+    email: account.email,
+  );
+
+  logger.i(parseResponse.result);
+  return parseResponse.result as ParseUser;
+}
+
+Future<ParseUser?> logout() async {
+  final user = await ParseUser.currentUser() as ParseUser?;
+  if (user == null) {
+    return null;
+  }
+
+  final parseResponse = await user.logout();
+
+  logger.i(parseResponse.result);
+  return parseResponse.result as ParseUser;
 }
