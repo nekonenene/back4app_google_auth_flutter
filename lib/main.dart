@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -33,6 +34,10 @@ class MyApp extends StatelessWidget {
       },
       child: MaterialApp(
         title: appTitle,
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: const [
+          Locale("ja", "JP"),
+        ],
         home: Scaffold(
           appBar: AppBar(
             title: const Text(appTitle),
