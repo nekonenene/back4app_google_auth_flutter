@@ -33,3 +33,7 @@ flutter pub get
 ```sh
 flutter run
 ```
+
+<p align="center">
+    <img src="./doc/ss.png" alt="Screenshot" width="auto" height="400px">
+</p>
