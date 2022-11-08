@@ -66,6 +66,8 @@ class SignInOutWidget extends StatefulWidget {
 
 class SignInOutWidgetState extends State<SignInOutWidget> {
   ParseUser? currentUser;
+  bool enabledSignInButton = true;
+  bool enabledLogoutButton = true;
 
   Widget currentStateText() {
     late final String message;
@@ -115,7 +117,10 @@ void showFailedSignInToast() async {
           children: [
             ElevatedButton(
               onPressed: () async {
+                if (!enabledSignInButton) return;
                 if (currentUser != null) return;
+
+                enabledSignInButton = false;
 
                 final user = await googleLogin();
                 if (user != null) {
@@ -125,12 +130,17 @@ void showFailedSignInToast() async {
                 } else {
                   showFailedSignInToast();
                 }
+
+                enabledSignInButton = true;
               },
               child: const Text('SIGN IN'),
             ),
             ElevatedButton(
               onPressed: () async {
+                if (!enabledLogoutButton) return;
                 if (currentUser == null) return;
+
+                enabledLogoutButton = false;
 
                 final succeededLogout = await logoutCompletely();
                 if (succeededLogout) {
@@ -138,6 +148,8 @@ void showFailedSignInToast() async {
                     currentUser = null;
                   });
                 }
+
+                enabledLogoutButton = true;
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
