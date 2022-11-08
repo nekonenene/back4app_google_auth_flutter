@@ -142,17 +142,15 @@ void showFailedSignInToast() async {
 }
 
 Future<ParseUser?> googleLogin() async {
-  final user = await ParseUser.currentUser() as ParseUser?;
-  if (user != null) {
-    return user;
-  }
-
   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
   ]);
-  GoogleSignInAccount? account = await googleSignIn.signIn();
-  logger.i(googleSignIn);
+
+  GoogleSignInAccount? account = googleSignIn.currentUser;
+  account ??= await googleSignIn.signInSilently(); // アカウント選択の必要がないなら暗転を挟まない
+  account ??= await googleSignIn.signIn();
+
   logger.i(account);
 
   // アカウント選択画面でどれも選ばれずに戻った場合
