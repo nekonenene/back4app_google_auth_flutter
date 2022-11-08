@@ -150,7 +150,7 @@ Future<ParseUser?> googleLogin() async {
   account ??= await googleSignIn.signInSilently(); // アカウント選択の必要がないなら暗転を挟まない
   account ??= await googleSignIn.signIn();
 
-  logger.i(account);
+  logger.i('account: $account');
 
   // アカウント選択画面でどれも選ばれずに戻った場合
   if (account == null) {
@@ -165,20 +165,20 @@ Future<ParseUser?> googleLogin() async {
     email: account.email,
   );
 
-  logger.i(parseResponse.result);
+  logger.i('parseResponse.result: ${parseResponse.result}');
   return parseResponse.result as ParseUser;
 }
 
 // Logout only as ParseUser
 Future<bool> logout() async {
   final user = await ParseUser.currentUser() as ParseUser?;
-  logger.d(user);
+  logger.d('user: $user');
   if (user == null) {
     return false;
   }
 
   final parseResponse = await user.logout();
-  logger.d(parseResponse.success);
+  logger.d('parseResponse.success: ${parseResponse.success}');
   return parseResponse.success;
 }
 
@@ -188,7 +188,7 @@ Future<bool> logoutCompletely() async {
   if (!succeededLogout) return false;
 
   GoogleSignInAccount? account = await googleSignIn.signOut();
-  logger.i(account);
+  logger.i('account: $account');
 
   return true;
 }
