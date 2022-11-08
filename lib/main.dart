@@ -178,7 +178,7 @@ Future<ParseUser?> googleLogin({ bool silent = false }) async {
 }
 
 // Logout only as ParseUser
-Future<bool> logout() async {
+Future<bool> logoutParse() async {
   final user = await ParseUser.currentUser() as ParseUser?;
   logger.d('user: $user');
   if (user == null) {
@@ -190,13 +190,30 @@ Future<bool> logout() async {
   return parseResponse.success;
 }
 
+// Logout GoogleSignInAccount
+Future<bool> logoutGoogle() async {
+  GoogleSignInAccount? account = googleSignIn.currentUser;
+  if (account == null) return false;
+
+  account = await googleSignIn.signOut();
+  logger.i('account: $account');
+
+  return true;
+}
+
 // Logout ParseUser and GoogleSignInAccount
 Future<bool> logoutCompletely() async {
-  final succeededLogout = await logout();
-  if (!succeededLogout) return false;
+  final List<Future<bool>> futures = <Future<bool>>[];
 
-  GoogleSignInAccount? account = await googleSignIn.signOut();
-  logger.i('account: $account');
+  futures.add(logoutParse());
+  futures.add(logoutGoogle());
+
+  final succeededResultList = await Future.wait(futures);
+  logger.i('succeededResultList: $succeededResultList');
+
+  if (succeededResultList.contains(false)) {
+    return false;
+  }
 
   return true;
 }
