@@ -7,6 +7,10 @@ import 'package:logger/logger.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 
 final logger = Logger();
+final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile',
+]);
 
 void main() async {
   await dotenv.load(fileName: '.env');
@@ -122,7 +126,7 @@ void showFailedSignInToast() async {
               onPressed: () async {
                 if (currentUser == null) return;
 
-                final succeededLogout = await logout();
+                final succeededLogout = await logoutCompletely();
                 if (succeededLogout) {
                   setState(() {
                     currentUser = null;
@@ -142,11 +146,6 @@ void showFailedSignInToast() async {
 }
 
 Future<ParseUser?> googleLogin() async {
-  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-  ]);
-
   GoogleSignInAccount? account = googleSignIn.currentUser;
   account ??= await googleSignIn.signInSilently(); // アカウント選択の必要がないなら暗転を挟まない
   account ??= await googleSignIn.signIn();
@@ -170,6 +169,7 @@ Future<ParseUser?> googleLogin() async {
   return parseResponse.result as ParseUser;
 }
 
+// Logout only as ParseUser
 Future<bool> logout() async {
   final user = await ParseUser.currentUser() as ParseUser?;
   logger.d(user);
@@ -180,4 +180,15 @@ Future<bool> logout() async {
   final parseResponse = await user.logout();
   logger.d(parseResponse.success);
   return parseResponse.success;
+}
+
+// Logout ParseUser and GoogleSignInAccount
+Future<bool> logoutCompletely() async {
+  final succeededLogout = await logout();
+  if (!succeededLogout) return false;
+
+  GoogleSignInAccount? account = await googleSignIn.signOut();
+  logger.i(account);
+
+  return true;
 }
