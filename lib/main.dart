@@ -78,8 +78,14 @@ class SignInOutWidgetState extends State<SignInOutWidget> {
     return Text(message, style: const TextStyle(fontSize: 20));
   }
 
-  void fetchCurrentUser() async {
-    currentUser = await ParseUser.currentUser() as ParseUser?;
+  // Check whether sign-in already, and set currentUser
+  void initCurrentUser() async {
+    final user = await ParseUser.currentUser() as ParseUser?;
+    if (user != null) {
+      setState(() {
+        currentUser = user;
+      });
+    }
   }
 
 void showFailedSignInToast() async {
@@ -94,7 +100,7 @@ void showFailedSignInToast() async {
   @override
   void initState() {
     super.initState();
-    fetchCurrentUser();
+    initCurrentUser();
   }
 
   @override
@@ -145,10 +151,12 @@ void showFailedSignInToast() async {
   }
 }
 
-Future<ParseUser?> googleLogin() async {
+Future<ParseUser?> googleLogin({ bool silent = false }) async {
   GoogleSignInAccount? account = googleSignIn.currentUser;
   account ??= await googleSignIn.signInSilently(); // アカウント選択の必要がないなら暗転を挟まない
-  account ??= await googleSignIn.signIn();
+  if (!silent) {
+    account ??= await googleSignIn.signIn();
+  }
 
   logger.i('account: $account');
 
